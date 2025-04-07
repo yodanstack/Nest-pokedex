@@ -7,14 +7,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SeedController } from 'src/seed/seed.controller';
 import { PaginationDto } from 'src/common/dto/pagination.dt';
 import { of } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PokemonService {
   
+  private defaultLimit: number;
+
   constructor(
     @InjectModel(Pokemon.name)
     private readonly pokemonModel: Model<Pokemon>,
-  ){}
+
+    private readonly configService: ConfigService
+  ){
+    this.defaultLimit = configService.get<number>('defaultLimit') ?? 10; // Default to 10 if undefined
+  }
   
  async create(createPokemonDto: CreatePokemonDto) {
     createPokemonDto.name = createPokemonDto.name.toLocaleLowerCase();
